@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, time, datetime, calendar, urllib2
+import os, time, datetime, calendar, urllib.request, urllib.error, urllib.parse
 import boto, boto.sqs, boto.s3, boto.ec2
 import boto.utils
 from brenda import utils
@@ -233,13 +233,13 @@ def shutdown(opts, conf, iids):
     # Note that persistent spot instances must be explicitly cancelled,
     # or EC2 will automatically requeue the spot instance request
     if opts.terminate:
-        print "TERMINATE", iids
+        print("TERMINATE", iids)
         if not opts.dry_run and iids:
             conn = get_ec2_conn(conf)
             cancel_spot_requests_from_instance_ids(conn, instance_ids=iids)
             conn.terminate_instances(instance_ids=iids)
     else:
-        print "SHUTDOWN", iids
+        print("SHUTDOWN", iids)
         if not opts.dry_run and iids:
             conn = get_ec2_conn(conf)
             cancel_spot_requests_from_instance_ids(conn, instance_ids=iids)
@@ -368,8 +368,8 @@ def mount_additional_ebs(conf, proj_dir):
         utils.mount(dev, dir)
 
 def get_instance_id_self():
-    req = urllib2.Request("http://169.254.169.254/latest/meta-data/instance-id")
-    response = urllib2.urlopen(req)
+    req = urllib.request.Request("http://169.254.169.254/latest/meta-data/instance-id")
+    response = urllib.request.urlopen(req)
     the_page = response.read()
     return the_page
 
@@ -390,7 +390,7 @@ def cancel_spot_request(conf, sir):
 def cancel_spot_requests_from_instance_ids(conn, instance_ids):
     instances = get_ec2_instances_from_conn(conn, instance_ids=instance_ids)
     sirs = [ i.spot_instance_request_id for i in instances if i.spot_instance_request_id ]
-    print "CANCEL", sirs
+    print("CANCEL", sirs)
     if sirs:
         conn.cancel_spot_instance_requests(request_ids=sirs)
 

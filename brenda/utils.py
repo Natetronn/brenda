@@ -17,37 +17,37 @@
 import os, subprocess, shutil
 
 def system(cmd, ignore_errors=False):
-    print "***", cmd
+    print("***", cmd)
     succeed = 0
     ret = subprocess.call(cmd)
     if not ignore_errors and ret != succeed:
         raise ValueError("command failed with status %r (expected %r)" % (ret, succeed))
 
 def rmtree(dir):
-    print "RMTREE", dir
+    print("RMTREE", dir)
     shutil.rmtree(dir, ignore_errors=True)
 
 def rm(file):
-    print "RM", file
+    print("RM", file)
     try:
         os.remove(file)
     except:
         pass
 
 def mkdir(dir):
-    print "MKDIR", dir
+    print("MKDIR", dir)
     os.mkdir(dir)
 
 def makedirs(dir):
-    print "MAKEDIRS", dir
+    print("MAKEDIRS", dir)
     os.makedirs(dir)
 
 def mv(src, dest):
-    print "MV %s %s" % (src, dest)
+    print("MV %s %s" % (src, dest))
     shutil.move(src, dest)
 
 def shutdown():
-    print "SHUTDOWN"
+    print("SHUTDOWN")
     system(["/sbin/shutdown", "-h", "0"])
 
 def write_atomic(path, data):
@@ -114,7 +114,7 @@ def system_return_output(cmd, capture_stderr=False):
     error = ""
     try:
         output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError, e:
+    except subprocess.CalledProcessError as e:
         if capture_stderr:
             error = e.output
     return str_nl(output) + str_nl(error)

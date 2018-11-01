@@ -10,7 +10,7 @@ url = k.generate_url(600, force_http=True)
 try:
     etag = '779ccf330e7c227ebbf7b34f0a6bae79foo'
     status = paracurl.download('foo.dat', url, max_threads=4, n_retries=4, etag=etag, debug=2)
-except paracurl.Exception, e:
-    print "Caught Exception:", e
+except paracurl.Exception as e:
+    print("Caught Exception:", e)
 else:
-    print "Return Value:", status
+    print("Return Value:", status)

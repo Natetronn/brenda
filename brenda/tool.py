@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import threading, time, Queue
+import threading, time, queue
 from brenda import aws, utils
 
 def instances(opts, conf):
     now = time.time()
     for i in aws.filter_instances(opts, conf):
         uptime = aws.get_uptime(now, i.launch_time)
-        print i.image_id, aws.format_uptime(uptime), i.public_dns_name
+        print(i.image_id, aws.format_uptime(uptime), i.public_dns_name)
 
 def ssh_args(opts, conf):
     user = utils.get_opt(opts.user, conf, 'AWS_USER', default='root')
@@ -54,7 +54,7 @@ def run_cmd_list(opts, conf, cmd_seq, show_output, capture_stderr):
         while True:
             try:
                 item = q.get(block=False)
-            except Queue.Empty, e:
+            except queue.Empty as e:
                 break
             else:
                 node, cmd = item
@@ -62,12 +62,12 @@ def run_cmd_list(opts, conf, cmd_seq, show_output, capture_stderr):
                 data = (node, output)
                 with lock:
                     if show_output:
-                        print "------- %s\n%s" % data,
+                        print("------- %s\n%s" % data, end=' ')
                     ret.append(data)
                 q.task_done()
 
     ret = []
-    q = Queue.Queue()
+    q = queue.Queue()
     for task in cmd_seq:
         #if opts.verbose:
         #    print task
@@ -122,15 +122,15 @@ def prune(opts, conf, args):
         script = ['if', '!', '[', '-f', 'task_last', '];', 'then', 'echo', 'SMALL;', 'elif', '[', '-f', pidfile, '];', 'then', 'cat', 'task_last;', 'else', 'echo', 'BIG;', 'fi']
         data = [(keyfunc(i), i[0]) for i in run_cmd_list(opts, conf, ssh_cmd_list(opts, conf, script), show_output=False, capture_stderr=False)]
         data.sort(reverse=True)
-        print "Prune ranking data"
+        print("Prune ranking data")
         for d in data:
-            print d
+            print(d)
         n_shutdown = len(data) - prune_target
         if n_shutdown > 0:
             shutdown_list = [i[1] for i in data[:n_shutdown]]
-            print "Shutdown list"
+            print("Shutdown list")
             for sd in shutdown_list:
-                print sd
+                print(sd)
             if not opts.dry_run:
                 aws.shutdown_by_public_dns_name(opts, conf, shutdown_list)
 
@@ -173,7 +173,7 @@ def perf(opts, conf, args):
     total_tasks = 0.0
     total_uptime = 0
     total_n = 0
-    for itype, stat in data.items():
+    for itype, stat in list(data.items()):
         total_tasks += stat['task_sum']
         total_uptime += stat['uptime_sum']
         total_n += stat['n']
@@ -186,9 +186,9 @@ def perf(opts, conf, args):
     tph.sort(reverse=True)
     tpd.sort(reverse=True)
     if total_n:
-        print "Tasks per hour (%.02f)" % (total_tasks / total_uptime * total_n,)
+        print("Tasks per hour (%.02f)" % (total_tasks / total_uptime * total_n,))
         for tasks_per_hour, itype in tph:
-            print "  %s %.02f" % (itype, tasks_per_hour)
-        print "Tasks per US$"
+            print("  %s %.02f" % (itype, tasks_per_hour))
+        print("Tasks per US$")
         for tasks_per_dollar, itype in tpd:
-            print "  %s %.02f" % (itype, tasks_per_dollar)
+            print("  %s %.02f" % (itype, tasks_per_dollar))

@@ -9,8 +9,8 @@ url = k.generate_url(600, force_http=True)
 
 try:
     status = paracurl.download('foo.dat', url, max_threads=64, debug=1)
-except paracurl.Exception, e:
-    print "Caught Exception:", e
+except paracurl.Exception as e:
+    print("Caught Exception:", e)
 else:
-    print "Return Value:", status
+    print("Return Value:", status)
 

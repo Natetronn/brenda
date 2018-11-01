@@ -16,8 +16,8 @@ for png in sys.argv[1:]:
     pix = im.load()
     data.append(pix)
 
-for x in xrange(X):
-    for y in xrange(Y):
+for x in range(X):
+    for y in range(Y):
         color = (0, 0, 0)
         for d in data:
             c = d[x, y]
